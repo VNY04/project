@@ -1,13 +1,15 @@
 import {createStore,combineReducers,applyMiddleware} from 'redux'
 import thunk from 'redux-thunk'
 import {composeWithDevTools} from 'redux-devtools-extension'
-import { studentLoginReducer } from './reducers/studentReducer'
-import { lenderLoginReducer } from './reducers/lenderReducer'
+import { studentLoginReducer, studentSignUpReducer } from './reducers/studentReducer'
+import { lenderLoginReducer,lenderSignUpReducer } from './reducers/lenderReducer'
 
 
 const reducer=combineReducers({
     studentLogin:studentLoginReducer,
-    lenderLogin:lenderLoginReducer  
+    lenderLogin:lenderLoginReducer,
+    studentSignUp:studentSignUpReducer,
+    lenderSignUp:lenderSignUpReducer  
 })
 
 const studentInfoFromStorage=localStorage.getItem('studentInfo')?JSON.parse(localStorage.getItem('studentInfo')):null

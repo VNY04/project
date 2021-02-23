@@ -32,6 +32,32 @@ const authLender=asyncHandler(async(req,res)=>{
     }
 })
 
-router.route('/login').post(authLender)
 
+const signupLender=asyncHandler(async(req,res)=>{
+    const {name,email,password,mobileNumber,adhaarNumber,address,city,state,zipCode}=req.body
+    const userExists=await lenders.find((lender)=>email===lender.email_address)
+    if(userExists){
+        res.status(400)
+        throw new Error('User Already Exists')
+    }
+
+    const user={_id:lenders.length+1,name,email_address:email,password,address,city,state,zipcode:zipCode,mobile_number:mobileNumber,adhaar_number:adhaarNumber,verified:false,image:''}
+    lenders.push(user)
+    const new_user=lenders.find((lender)=>email===lender.email_address)
+
+    if(new_user){
+        res.status(201).json({
+            _id:new_user._id,
+            name:new_user.name,
+            email:new_user.email_address,
+        })
+    }else{
+        res.status(400)
+        throw new Error('Invalid user Data')
+    }
+
+})
+
+router.route('/login').post(authLender)
+router.route('/signup').post(signupLender)
 export default router

@@ -31,8 +31,6 @@ const LoginPage = ({history,location}) => {
         }
     },[history,studentInfo,lenderInfo])
 
-    console.log(url)
-
     const submitHandler =(e)=>{
         e.preventDefault()
         if(url==='/studentlogin'){
@@ -63,7 +61,9 @@ const LoginPage = ({history,location}) => {
                     </Form.Group>
                     <Button type='submit' variant='primary'>Login</Button>
                     <Row style={{paddingTop:'20px'}}>
-                        <Col>Not a User? <Link to={'/signup'}>Register</Link></Col>
+                        <Col>Not a User? 
+                            {url==='/studentlogin'?<Link to={'/signup/student'}>Register</Link>:<Link to={'/signup/lender'}>Register</Link>}
+                        </Col>
                     </Row>
                 </Form>
             </FormContainer>

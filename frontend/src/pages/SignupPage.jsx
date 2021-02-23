@@ -1,9 +1,14 @@
-import React, { useState } from 'react'
+import {useDispatch,useSelector} from 'react-redux'
+import React, { useState,useEffect } from 'react'
 import FormContainer from '../components/FormContainer'
 import {Form,Button,Row,Col} from 'react-bootstrap'
 import {Link} from 'react-router-dom'
+import { signupStudent } from '../actions/studentActions'
+import { signupLender } from '../actions/lenderActions'
+import Message from '../components/Message'
+import Loader from '../components/Loader'
 
-const SignupPage = () => {
+const SignupPage = ({history,location}) => {
 
     const [name,setName]=useState('')
     const [email,setEmail]=useState('')
@@ -18,21 +23,49 @@ const SignupPage = () => {
     const [state,setState]=useState('')
     const [zipCode,setZipCode]=useState(0)
     const [message,setMessage]=useState('')
+
+    const dispatch=useDispatch()
+
+    const studentSignUp =useSelector(state=>state.studentSignUp)
+    const {loading:studentLoading,error:studentError,studentInfo}=studentSignUp
+
+    
+    const lenderSignUp =useSelector(state=>state.lenderSignUp)
+    const {loading:lenderLoading,error:lenderError,lenderInfo}=lenderSignUp
+
+    const url = window.location.pathname.split('/')[2]
+    useEffect(()=>{
+        if(studentInfo){
+            history.push('/student')
+        }else if(lenderInfo){
+            history.push('/lender')
+        }
+    },[history,studentInfo,lenderInfo])
+    
+    
+    let user={}
+
     const submitHandler =(e)=>{
         e.preventDefault()
         if(password!==confirmPassword){
             setMessage('Password do not Match')
-            
         }else{
-            setMessage('Sign up successful')
-            console.log(name,email,password,state);
+            if(url==='student'){
+                user={name,email,password,mobileNumber,collegeID,adhaarNumber,guardianAdhaarNumber,address,city,state,zipCode}
+                dispatch(signupStudent(user))
+            }else if(url==='lender'){
+                user={name,email,password,mobileNumber,adhaarNumber,address,city,state,zipCode}
+                dispatch(signupLender(user))
+            } 
         }
-        alert(message)
     }
 
     return (
         <FormContainer>
             <h1>Sign Up</h1>
+            {(studentLoading || lenderLoading) && <Loader/>}
+            {message && <Message variant='danger'>{message}</Message>}
+            {(studentError || lenderError) && <Message variant='danger'>{studentError?studentError:lenderError}</Message>}
             <Form onSubmit={submitHandler}>
                 <Form.Row>
                     <Form.Group as={Col}>
@@ -83,10 +116,11 @@ const SignupPage = () => {
                         <Form.Control  type='integer' placeholder='ZipCode' value={zipCode} onChange={(e)=>setZipCode(e.target.value)} />
                     </Form.Group>
                 </Form.Row>
-                <Form.Group>
-                    <Form.Label>College ID</Form.Label>
-                    <Form.Control type='input' placeholder='Enter College ID' value={collegeID} onChange={(e)=>setCollegeID(e.target.value)}  />
-                </Form.Group>
+                {url==='student'?(<>
+                    <Form.Group>
+                        <Form.Label>College ID</Form.Label>
+                        <Form.Control type='input' placeholder='Enter College ID' value={collegeID} onChange={(e)=>setCollegeID(e.target.value)}  />
+                    </Form.Group>
                 <Form.Row>
                     <Form.Group as={Col}>
                         <Form.Label>Adhaar Number</Form.Label>
@@ -97,9 +131,15 @@ const SignupPage = () => {
                         <Form.Control type='text' placeholder='Enter guardian Adhaar No.' value={guardianAdhaarNumber} onChange={(e)=>setGuardianAdhaarNumber(e.target.value)}  />
                     </Form.Group>
                 </Form.Row>
+                </>
+                ):(<Form.Group>
+                    <Form.Label>Adhaar Number</Form.Label>
+                    <Form.Control type='text' placeholder='Enter Adhaar No.' value={adhaarNumber} onChange={(e)=>setAdhaarNumber(e.target.value)}  />
+                </Form.Group>)}
+                
                 <Button type='submit' variant='primary'>Sign Up</Button>
                 <Row style={{paddingTop:'20px'}}>
-                    <Col>Already a User ? <Link to={'/login'}>Login</Link></Col>
+                    <Col>Already a User ? {url==='student'?<Link to={'/studentlogin'}>Login</Link>:<Link to={'/lenderlogin'}>Login</Link>}</Col>
                 </Row>
             </Form>
         </FormContainer>

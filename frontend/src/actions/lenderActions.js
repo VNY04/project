@@ -32,3 +32,39 @@ export const logoutLender =()=>(dispatch)=>{
     localStorage.removeItem('lenderInfo')
     dispatch({type:'LENDER_LOGOUT'})
 }
+
+export const signupLender =(lender)=>async(dispatch)=>{
+    try {
+        dispatch({
+            type:'LENDER_SIGNUP_REQUEST'
+        })
+
+        const config={
+            headers:{
+                'Content-Type':'application/json'
+            }
+        }
+
+        const {data} = await axios.post('/lender/signup',lender,config)
+
+        dispatch({
+            type:'LENDER_SIGNUP_SUCCESS',
+            payload:data
+        })
+
+        dispatch({
+            type:'LENDER_LOGIN_SUCCESS',
+            payload:data
+        })
+
+        localStorage.setItem('lenderInfo',JSON.stringify(data))
+
+
+
+    } catch (error) {
+        dispatch({
+            type:'LENDER_SIGNUP_FAILED',
+            payload:error.response && error.response.data.message?error.response.data.message:error.message
+        })
+    }
+}
